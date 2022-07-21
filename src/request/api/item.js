@@ -6,3 +6,10 @@ export function getMusicItemList(data){
         url:`/playlist/detail?id=${data}`
     })
 }
+//获取歌单歌曲的数据
+export function getMusicList(data){
+    return service({
+        method:'GET',
+        url:`/playlist/track/all?id=${data}&limit=20`
+    })
+}
