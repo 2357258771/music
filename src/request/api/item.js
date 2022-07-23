@@ -13,3 +13,11 @@ export function getMusicList(data){
         url:`/playlist/track/all?id=${data}&limit=20`
     })
 }
+//获取歌曲歌词的数据
+export function getMusicLyric(data){
+    return service({
+        method:'GET',
+        url:`/lyric?id=${data}`
+    })
+}
+

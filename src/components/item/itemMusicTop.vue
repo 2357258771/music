@@ -88,6 +88,9 @@ export default {
   height: 1rem;
   // padding: .2rem;
   position: relative;
+  border-bottom-left-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+  background-color: white;
   .itemLeft,
   .itemRight {
     width: 25%;
@@ -98,11 +101,8 @@ export default {
     span {
       font-size: 0.4rem;
       font-weight: 500;
-      color: white;
     }
-    .icon {
-      fill: white;
-    }
+
   }
 }
 .itemMusicBody {

@@ -1,6 +1,6 @@
 <template>
   <div class="footMusic">
-    <div class="footerLeft" @click="show=!show">
+    <div class="footerLeft" @click="show = !show">
       <img :src="playList[playListIndex].al.picUrl" alt="" />
       <div class="musicName">
         <p>{{ playList[playListIndex].name }}</p>
@@ -20,20 +20,34 @@
       ref="audio"
       :src="` https://music.163.com/song/media/outer/url?id=${playList[playListIndex].id}.mp3`"
     ></audio>
-    <van-popup v-model:show="show" position="right" :style="{ height: '100%',width:'100%' }" >111</van-popup>
+    <van-popup
+      v-model:show="show"
+      position="right"
+      :style="{ height: '100%', width: '100%' }"
+    >
+      <MusicDetail
+        :playList="playList"
+        :playListIndex="playListIndex"
+        :isPlaying="isPlaying"
+        :play="play"
+        v-model:show="show"
+      />
+    </van-popup>
   </div>
 </template>
 
 <script>
-import { ref, computed, watch } from "@vue/runtime-core";
+import { ref, computed, watch, onUpdated, onMounted } from "@vue/runtime-core";
 import { useStore } from "vuex";
-
+import MusicDetail from "@/components/item/MusicDetail";
 export default {
+  components: { MusicDetail },
+
   setup() {
     const store = useStore();
     const audio = ref(null);
 
-    let show=ref(false)
+    let show = ref(false);
 
     const playList = computed(() => store.state.playList);
     const playListIndex = computed(() => store.state.playListIndex);
@@ -42,9 +56,12 @@ export default {
     const updateIsPlaying = (val) => {
       store.commit("updateIsPlaying", val);
     };
-    // onMounted(() => {
-    //   console.log(audio.value);
-    // });
+    onMounted(() => {
+      store.dispatch("getLyric", playList.value[playListIndex.value].id);
+    });
+    onUpdated(() => {
+      store.dispatch("getLyric", playList.value[playListIndex.value].id);
+    });
     function play() {
       if (audio.value.paused) {
         audio.value.play();
@@ -67,7 +84,7 @@ export default {
       isPlaying,
       playListIndex,
       playList,
-      show
+      show,
     };
   },
 };

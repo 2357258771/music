@@ -1,35 +1,47 @@
 import { createStore } from 'vuex'
-
+import {getMusicLyric} from '@/request/api/item'
 export default createStore({
   state: {
     playList: [{//播放列表
       al: {
-        id: 525568,
-        name: "ALIVE",
-        pic: 5649290743585546,
-        picUrl: "https://p2.music.126.net/DACbuAsZkYFpDFJGhGXTsQ==/5649290743585546.jpg"
+        id: 98517711,
+        name: "是但求其爱",
+        pic: 109951165480807280,
+        picUrl: "https://p1.music.126.net/flFrObLA9GZdj8B0b6ni1A==/109951165480807278.jpg",
+        pic_str: "109951165480807278"
       },
-      name:"ALIVE",
-      id:5366197
+      ar: [{ id: 2116, name: '陈奕迅' }],
+      name: "是但求其爱",
+      id: 1496602290
     }],
-    playListIndex:0,
-    isPlaying:true,//是否播放
+    playListIndex: 0,
+    isPlaying: true,//是否播放
+    lyricList:{}
   },
   getters: {
   },
   mutations: {
-    updateIsPlaying(state,value) {
-      state.isPlaying=value
+    updateIsPlaying(state, value) {
+      state.isPlaying = value
     },
-    updatePlayList(state,value){
-      state.playList=value
-      console.log(state.playList)
+    updatePlayList(state, value) {
+      state.playList = value
+      // console.log(state.playList)
     },
-    updatePlayListIndex(state,value){
-      state.playListIndex=value
+    updatePlayListIndex(state, value) {
+      state.playListIndex = value
+    },
+    updateLyric(state, value) {
+      state.lyricList = value
+      console.log(state.lyricList)
     }
+
   },
   actions: {
+    async getLyric(context,value){
+      let res=await getMusicLyric(value)
+      context.commit("updateLyric",res.data.lrc)
+    }
   },
   modules: {
   }

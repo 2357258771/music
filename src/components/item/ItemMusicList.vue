@@ -58,7 +58,7 @@ export default {
         return (num / 10000).toFixed(1) + "万";
       }
     }
-    return { changeCount,playMusic };
+    return { changeCount, playMusic };
   },
   props: ["songsList", "subscribedCount"],
 };
@@ -67,7 +67,7 @@ export default {
 <style lang="less" scoped>
 .itemMusicList {
   width: 100%;
-  height: 10rem;
+  height: auto;
   display: flex;
   flex-direction: column;
   background: white;
@@ -75,6 +75,7 @@ export default {
   border-top-right-radius: 0.4rem;
   margin-top: 0.7rem;
   padding: 0.1rem 0.2rem;
+  margin-bottom: 1.4rem;
   .itemMusicListTop {
     width: 100%;
     height: 1rem;
@@ -119,6 +120,8 @@ export default {
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow: scroll;
+
     .musicItem {
       display: flex;
       align-items: center;
