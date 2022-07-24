@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import {getMusicLyric} from '@/request/api/item'
+import { getMusicLyric } from '@/request/api/item'
 export default createStore({
   state: {
     playList: [{//播放列表
@@ -16,7 +16,10 @@ export default createStore({
     }],
     playListIndex: 0,
     isPlaying: true,//是否播放
-    lyricList:{}
+    lyricList: {},
+    currentTime: 0,//当前播放时间
+    isEnded: true,
+    duration: 0
   },
   getters: {
   },
@@ -33,14 +36,26 @@ export default createStore({
     },
     updateLyric(state, value) {
       state.lyricList = value
-      console.log(state.lyricList)
-    }
+      // console.log(state.lyricList)
+    },
+    updateCurrentTime(state, value) {
+      // console.log(state.currentTime)
+      state.currentTime = value
+    },
+    updateIsEnded(state, value) {
+      state.isEnded = value
+    },
+    updateDuration(state, value) {
+      state.duration = value
+      console.log(state.duration)
+
+    },
 
   },
   actions: {
-    async getLyric(context,value){
-      let res=await getMusicLyric(value)
-      context.commit("updateLyric",res.data.lrc)
+    async getLyric(context, value) {
+      let res = await getMusicLyric(value)
+      context.commit("updateLyric", res.data.lrc)
     }
   },
   modules: {

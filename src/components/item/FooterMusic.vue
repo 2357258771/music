@@ -19,6 +19,7 @@
     <audio
       ref="audio"
       :src="` https://music.163.com/song/media/outer/url?id=${playList[playListIndex].id}.mp3`"
+      @canplay="getDuration"
     ></audio>
     <van-popup
       v-model:show="show"
@@ -40,42 +41,81 @@
 import { ref, computed, watch, onUpdated, onMounted } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import MusicDetail from "@/components/item/MusicDetail";
+
 export default {
   components: { MusicDetail },
 
   setup() {
     const store = useStore();
     const audio = ref(null);
+    // let ended = ref(true);
+    let interVal = null;
 
     let show = ref(false);
+
+    function updateTime() {
+      interVal = setInterval(() => {
+        store.commit("updateIsEnded", audio.value.ended);
+        store.commit("updateCurrentTime", audio.value.currentTime);
+      }, 1000);
+    }
 
     const playList = computed(() => store.state.playList);
     const playListIndex = computed(() => store.state.playListIndex);
     const isPlaying = computed(() => store.state.isPlaying);
+    const isEnded = computed(() => store.state.isEnded);
+
+    const duration = ref(0);
+
+    const getDuration = () => {
+      duration.value = audio.value.duration;
+      // console.log(duration.value);
+      store.commit("updateDuration", duration.value);
+    };
 
     const updateIsPlaying = (val) => {
       store.commit("updateIsPlaying", val);
     };
     onMounted(() => {
       store.dispatch("getLyric", playList.value[playListIndex.value].id);
+      // store.commit("updateDuration", audio.value.duration);
     });
     onUpdated(() => {
       store.dispatch("getLyric", playList.value[playListIndex.value].id);
+      // console.log(audio.value.duration);
+      // console.log([audio.value]);
     });
     function play() {
       if (audio.value.paused) {
         audio.value.play();
         updateIsPlaying(false);
+        updateTime();
       } else {
         audio.value.pause();
         updateIsPlaying(true);
+        clearInterval(interVal);
       }
     }
     //监听下标，如果下标发生改变，自动播放音乐
     watch([playList, playListIndex], () => {
+      clearInterval(interVal);
+      store.commit("updateCurrentTime", 0);
+      // console.log([audio.value]);
+      // audio.value.load()
+      // console.log(audio.value.duration);
+
+      // store.commit("updateDuration", audio.value.duration);
       audio.value.autoplay = true;
+      updateTime();
       if (audio.value.paused) {
         updateIsPlaying(false);
+      }
+    });
+    watch(isEnded, () => {
+      // console.log(isEnded.value);
+      if (isEnded.value === true) {
+        updateIsPlaying(true);
+        console.log("ok");
       }
     });
     return {
@@ -85,6 +125,8 @@ export default {
       playListIndex,
       playList,
       show,
+      interVal,
+      getDuration
     };
   },
 };
