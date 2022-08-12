@@ -20,4 +20,12 @@ export function getMusicLyric(data){
         url:`/lyric?id=${data}`
     })
 }
+//获取搜索歌曲的数据
+export function getSearchMusic(data){
+    return service({
+        method:'GET',
+        url:`/cloudsearch?keywords=${data}`
+    })
+}
+
 

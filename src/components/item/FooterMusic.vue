@@ -20,6 +20,10 @@
       ref="audio"
       :src="` https://music.163.com/song/media/outer/url?id=${playList[playListIndex].id}.mp3`"
       @canplay="getDuration"
+      @ended="isEnded"
+      @error="srcError"
+      @mousedown="isDraging = true"
+      @mouseup="isDraging = false"
     ></audio>
     <van-popup
       v-model:show="show"
@@ -31,6 +35,7 @@
         :playListIndex="playListIndex"
         :isPlaying="isPlaying"
         :play="play"
+        :audio="audio"
         v-model:show="show"
       />
     </van-popup>
@@ -38,7 +43,14 @@
 </template>
 
 <script>
-import { ref, computed, watch, onUpdated, onMounted } from "@vue/runtime-core";
+import {
+  ref,
+  computed,
+  watch,
+  onUpdated,
+  onMounted,
+  onUnmounted,
+} from "@vue/runtime-core";
 import { useStore } from "vuex";
 import MusicDetail from "@/components/item/MusicDetail";
 
@@ -52,25 +64,34 @@ export default {
     let interVal = null;
 
     let show = ref(false);
+    let isDraging = ref(false);
 
     function updateTime() {
-      interVal = setInterval(() => {
-        store.commit("updateIsEnded", audio.value.ended);
-        store.commit("updateCurrentTime", audio.value.currentTime);
-      }, 1000);
+
+        interVal = setInterval(() => {
+          // store.commit("updateIsEnded", audio.value.ended);
+          store.commit("updateCurrentTime", audio.value.currentTime);
+        }, 1000);
+      
     }
 
     const playList = computed(() => store.state.playList);
     const playListIndex = computed(() => store.state.playListIndex);
     const isPlaying = computed(() => store.state.isPlaying);
-    const isEnded = computed(() => store.state.isEnded);
+    // const isEnded = computed(() => store.state.isEnded);
+    function isEnded() {
+      updateIsPlaying(true);
+      console.log("ok");
+    }
 
     const duration = ref(0);
 
     const getDuration = () => {
-      duration.value = audio.value.duration;
-      // console.log(duration.value);
-      store.commit("updateDuration", duration.value);
+      if (audio.value !== null) {
+        duration.value = audio.value.duration;
+        // console.log(duration.value);
+        store.commit("updateDuration", duration.value);
+      }
     };
 
     const updateIsPlaying = (val) => {
@@ -80,11 +101,13 @@ export default {
       store.dispatch("getLyric", playList.value[playListIndex.value].id);
       // store.commit("updateDuration", audio.value.duration);
     });
+    //歌曲切换时,重新获取歌词
     onUpdated(() => {
       store.dispatch("getLyric", playList.value[playListIndex.value].id);
       // console.log(audio.value.duration);
       // console.log([audio.value]);
     });
+    //播放音乐
     function play() {
       if (audio.value.paused) {
         audio.value.play();
@@ -101,8 +124,8 @@ export default {
       clearInterval(interVal);
       store.commit("updateCurrentTime", 0);
       // console.log([audio.value]);
+
       // audio.value.load()
-      // console.log(audio.value.duration);
 
       // store.commit("updateDuration", audio.value.duration);
       audio.value.autoplay = true;
@@ -111,13 +134,26 @@ export default {
         updateIsPlaying(false);
       }
     });
-    watch(isEnded, () => {
-      // console.log(isEnded.value);
-      if (isEnded.value === true) {
-        updateIsPlaying(true);
-        console.log("ok");
-      }
+    onUnmounted(() => {
+      //清除定时器
+      clearInterval(interVal);
     });
+
+    // watch(isEnded, () => {
+    //   // console.log(isEnded.value);
+    //   if (isEnded.value === true) {
+    //     updateIsPlaying(true);
+    //     console.log("ok");
+    //   }
+    // });
+    function srcError() {
+      alert("该歌曲暂时无法播放");
+      let index = playListIndex.value + 1;
+      if (index === playList.value.length) {
+        index = 0;
+      }
+      store.commit("updatePlayListIndex", index);
+    }
     return {
       audio,
       play,
@@ -126,7 +162,10 @@ export default {
       playList,
       show,
       interVal,
-      getDuration
+      getDuration,
+      isEnded,
+      srcError,
+      isDraging,
     };
   },
 };

@@ -108,17 +108,25 @@ import { useStore } from "vuex";
 import { Vue3Marquee } from "vue3-marquee";
 import "vue3-marquee/dist/style.css";
 import { watch } from "@vue/runtime-core";
+import { get } from "vant/lib/utils";
 export default {
-  props: ["playList", "playListIndex", "isPlaying", "play", "show"],
+  props: ["playList", "playListIndex", "isPlaying", "play", "show", "audio"],
   components: { Vue3Marquee },
   emits: ["update:show"],
   setup(props, ctx) {
-    // console.log(props.show);
+    // console.log(props.audio);
     const store = useStore();
     const musicLyric = ref(null);
 
     const lyricList = computed(() => store.state.lyricList);
-    const currentTime = computed(() => store.state.currentTime);
+    //进度条绑定currentTime无法直接修改，因为computed是只读属性，需要设置set来进行更改
+    const currentTime = computed({
+      get: () => store.state.currentTime,
+      set: (val) => {
+        store.commit("updateCurrentTime", val);
+        props.audio.currentTime = val;
+      },
+    });
     const duration = computed(() => store.state.duration);
 
     const lyric = computed(() => {
@@ -158,7 +166,7 @@ export default {
         }
       }
       if (newValue === duration.value) {
-        goPlay(1)
+        goPlay(1);
       }
     });
 

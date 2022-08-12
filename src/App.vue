@@ -1,6 +1,7 @@
 <template>
+<!-- 当路由path 与访问的地址相符时，会将指定的组件替换该router-view -->
   <router-view/>
-  <FooterMusic/>
+  <FooterMusic v-if="$store.state.isFooterMusic"/>
 </template>
 <script>
 import FooterMusic from "@/components/item/FooterMusic"

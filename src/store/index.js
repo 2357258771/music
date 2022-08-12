@@ -1,5 +1,7 @@
 import { createStore } from 'vuex'
 import { getMusicLyric } from '@/request/api/item'
+import { getPhoneLogin } from '@/request/api/home'
+
 export default createStore({
   state: {
     playList: [{//播放列表
@@ -19,7 +21,9 @@ export default createStore({
     lyricList: {},
     currentTime: 0,//当前播放时间
     isEnded: true,
-    duration: 0
+    duration: 0,
+    isLogin:false,
+    isFooterMusic:true
   },
   getters: {
   },
@@ -39,8 +43,8 @@ export default createStore({
       // console.log(state.lyricList)
     },
     updateCurrentTime(state, value) {
-      // console.log(state.currentTime)
       state.currentTime = value
+      // console.log(state.currentTime)
     },
     updateIsEnded(state, value) {
       state.isEnded = value
@@ -48,7 +52,9 @@ export default createStore({
     updateDuration(state, value) {
       state.duration = value
       console.log(state.duration)
-
+    },
+    updateIsLogin(state, value) {
+      state.isLogin = value
     },
 
   },
@@ -56,6 +62,12 @@ export default createStore({
     async getLyric(context, value) {
       let res = await getMusicLyric(value)
       context.commit("updateLyric", res.data.lrc)
+    },
+    async getLogin(context, value) {
+      console.log("11")
+      let res = await getPhoneLogin(value)
+      // context.commit("updateIsLogin", res.data.lrc)
+      console.log(res)
     }
   },
   modules: {
